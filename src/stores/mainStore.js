@@ -1,8 +1,11 @@
+// Importação do módulo do Pinia e definição da store para futura exportação
 import { defineStore } from "pinia";
 
 export const useMainStore = defineStore("mainStore" , {
+  // Tudo que está dentro do state, são variáveis que podem ser acessadas e manipuladas entre os componentes
   state: () => {
     return {
+      // Vetor com todos os tipos de caminhões
       trucks: [
         {
           name: 'pequeno porte',
@@ -23,7 +26,7 @@ export const useMainStore = defineStore("mainStore" , {
           pricePerKM: 27.44
         }
       ],
-
+      // Vetor com todos os tipos de produtos
       products: [
         {
           id: 1,
@@ -57,6 +60,7 @@ export const useMainStore = defineStore("mainStore" , {
         },
       ],
 
+      // Vetor com todas as cidades (preenchido com os dados do CSV na mounted() do App.vue)
       cities: []
     }
   },

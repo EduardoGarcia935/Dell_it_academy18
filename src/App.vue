@@ -1,11 +1,14 @@
 <script>
+// Importando os componentes da aplicação
 import Header from './components/Header.vue'
 import Menu from './components/Menu.vue';
 
+// Importando a store do pinia, para compartilhar dados entre components
 import { useMainStore } from './stores/mainStore'
 import { storeToRefs } from 'pinia';
 
 export default{
+  // 'settando' compónents e a store, coisa padrão
   components: { Header , Menu },
   setup(){
     const mainStore = useMainStore()
@@ -17,6 +20,8 @@ export default{
       cities,
     }
   },
+  // Quando o component App (pai de todos os outros componentes) for montado,
+  // execute este código abaixo, que lê o CSV, cria os objetos 'cidade' e insire-os na store
   mounted(){
     fetch('../DNIT-Distancias.csv')
     .then(res => res.text())
@@ -64,6 +69,7 @@ export default{
 }
 </script>
 
+<!-- Código HTML -->
 <template>
  <main>
   <Header></Header>
