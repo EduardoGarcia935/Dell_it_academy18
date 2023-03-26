@@ -376,9 +376,7 @@ export default {
           </p>
           <p>
             Que quando percorridos utilizando um caminhão de
-            <span>{{ truck_OP1.name }}</span> geram um valor total de R${{
-              valor_OP1
-            }}
+            <span>{{ truck_OP1.name }}</span> geram um valor total de {{(valor_OP1).toLocaleString("pt-BR",{ style: "currency", currency: "BRL" })}}
           </p>
         </div>
       </div>
@@ -655,10 +653,6 @@ ol li:hover {
   display: flex;
   flex-direction: column;
   align-items: start;
-}
-
-.menu3 {
-  background-color: pink;
 }
 
 .menu3 .container_list {
