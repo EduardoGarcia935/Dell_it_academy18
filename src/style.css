@@ -10,3 +10,18 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+.btn{
+  padding: 12px 40px;
+  border-radius: 8px;
+  border: none;
+  outline-style: none;
+  cursor: pointer;
+  background-color: #007dbc;
+  color: #fff;
+}
+
+.disable{
+  pointer-events: none;
+  opacity: .5;
+}

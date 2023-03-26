@@ -6,13 +6,14 @@ import { storeToRefs } from 'pinia';
 export default{
   setup(){
     const mainStore = useMainStore()
-    const { trucks , products, cities, currentOption } = storeToRefs(mainStore)
+    const { trucks , products, cities, currentOption, transportes } = storeToRefs(mainStore)
 
     return {
       trucks,
       products,
       cities,
-      currentOption
+      currentOption,
+      transportes,
     }
   },
   // Todas as variáveis REATIVAS deste e somente deste componente são declaradas dentro do objeto Data()
@@ -27,6 +28,14 @@ export default{
       valor_OP1: '',
 
       OP2: false,
+      cidadePartida: '',
+      proximaParada: '',
+      listaParadas: [],
+      listaItens: [],
+      itemTravel: '',
+      itemQTD: '',
+      warning: false,
+
 
 
       OP3: false,
@@ -51,7 +60,6 @@ export default{
       this.resetALL(1)
     },
     menuOption2(){
-      console.log('OPÇÃO 2')
       this.resetALL(2)
     },
     menuOption3(){
@@ -74,7 +82,17 @@ export default{
       this.valor_OP1 = this.cidade1_OP1[this.cidade2_OP1.name] * this.truck_OP1.pricePerKM
     },
     actionOption2(){
+      let transporte = {
+        cidadeInicial: this.cidadePartida,
+        paradas: [],
+        itens: [],
+      }
+      this.listaParadas.forEach(cidade => {transporte.paradas.push(cidade)})
+      this.listaItens.forEach(item => transporte.itens.push(item))
 
+      this.transportes.push(transporte)
+      console.log(this.transportes)
+      this.warning = true
     },
     actionOption3(){
 
@@ -87,6 +105,14 @@ export default{
       this.truck_OP1 = ''
       this.distancia_OP1 = ''
       this.valor_OP1 = ''
+
+      this.cidadePartida = ''
+      this.proximaParada = ''
+      this.listaParadas = []
+      this.listaItens = [],
+      this.itemTravel = ''
+      this.itemQTD = ''
+      this.warning = false
 
       switch (OP){
         case 1:
@@ -121,7 +147,54 @@ export default{
         return false
       }
     },
-
+    // Adiciona uma cidade de parada dentro da store da lista de paradas(como se fosse uma ToDo)
+    addParada(){
+      this.listaParadas.push(this.proximaParada)
+      this.proximaParada = ''
+    },
+    // Remove cidade de parada dentro da store da lista de paradas(como se fosse uma ToDo)
+    removeParada(id){
+      this.listaParadas = this.listaParadas.filter(parada => parada.id !== id)
+    },
+    // Adiciona um item dentro da store da lista de itens(como se fosse uma ToDo)
+    addItem(){
+      this.itemTravel.qtd = this.itemQTD
+      this.listaItens.push(this.itemTravel)
+      this.itemTravel = ''
+      this.itemQTD = ''
+    },
+    // remove um item dentro da store da lista de itens(como se fosse uma ToDo)
+    removeItem(itemR){
+      this.listaItens = this.listaItens.filter(item => item !== itemR)
+    },
+    // Verifica se existe um item selecionado,uma quantidade selecionada e se esse item já 
+    // não foi adicinado na lista antes, tudo isso para liberar o botão de cadastrar item
+    testeItem(){
+      if(!this.itemTravel || !this.itemQTD || this.listaItens.includes(this.itemTravel)){
+        return true
+      }
+      else{
+        return false
+      }
+    },
+    // Não deixa adicionar paradas repetidas ou com o mesmo nome da cidade de partida
+    controleParadaRepetidaOP2(){
+      if(this.cidadePartida.name === this.proximaParada.name || this.listaParadas.includes(this.proximaParada) || this.proximaParada.length === 0){
+        return true
+      }
+      else{
+        return false
+      }
+    },
+    // Verifica se tem ao menos uma cidade inical, uma parada e um item selecionados para confirmar o transporte
+    checkTransporte(){
+      if(this.listaParadas.length === 0 || this.listaItens.length === 0 || !this.cidadePartida){
+        return true
+      }
+      else{
+        return false
+      }
+    }
   }
 }
 </script>
@@ -173,7 +246,7 @@ export default{
         </div>
         <div class="btn_container">
           <p v-if="controleFormularioOP1()">As cidades precisam ser diferentes</p>
-          <button :class="{disable : controleFormularioOP1()}" @click="actionOption1()">Verificar</button>
+          <button :class="{disable : controleFormularioOP1()}" @click="actionOption1()" class="btn">Verificar</button>
         </div>
         <div class="resultado">
           <p>A distância de <span>{{ cidade1_OP1.name }}</span> até <span>{{ cidade2_OP1.name }}</span> é de {{ distancia_OP1 }} Km.</p>
@@ -182,7 +255,64 @@ export default{
       </div>
     </div>
 
-    
+    <!-- Menu de opção 2 -->
+    <!-- 
+      Duas, principais partes, a de selecionar os itens para o transporte e as cidades.
+      ambas partes funcionam como uma lista ed Todo's, onde pode-se remover os itens selecionados
+      a hora que quiser, vale dizer que só pe possível cadastrar um transporte caso exista ao menos:
+      uma cidade inicial, uma cidade de parada e ao menos um tipo de item sendo transportado
+     -->
+    <div class="menu2" v-if="OP2">
+      <p>Opção 2</p>
+      <div class="container_inputs">
+        <div class="group">
+          <label>Selecione a cidade inicial do transporte</label>
+          <select v-model="cidadePartida">
+            <option v-for="city in cities" :key="city.id" :value="city">{{ city.name }}</option>
+          </select>
+        </div>
+        <div class="group">
+          <label>Selecione as paradas do transporte</label>
+          <select v-model="proximaParada">
+            <option v-for="city in cities" :key="city.id" :value="city">{{ city.name }}</option>
+          </select>
+          <button @click="addParada" class="btn" :class="{disable : controleParadaRepetidaOP2()}">Adicionar parada</button>
+        </div>
+        <div class="group cidades">
+          <div>
+            <p>Inicio</p>
+            <p>{{ cidadePartida.name }}</p>
+          </div>
+          <div>
+           <p>Paradas</p>
+           <p class="cidade" v-for="(parada) in listaParadas" :key="parada.id">{{ parada.name }} <button @click="removeParada(parada.id)">X</button></p>
+          </div>
+        </div>
+      </div>
+      <div class="container_itens">
+        <div class="group itens">
+          <label>Selecione os itens para adicionar a lista</label>
+          <select v-model="itemTravel">
+            <option v-for="item in products" :key="item.id" :value="item">{{ item.name }}</option>
+          </select>
+        </div>
+        <div class="group itens">
+          <label>Selecione a quantidade do item</label>
+          <input type="number" v-model="itemQTD">
+        </div>
+        <div class="group itens">
+          <button @click="addItem()" :class="{disable : testeItem()}" class="btn">Adicionar</button>
+        </div>
+        <div class="group display">
+          <p>Itens</p>
+          <p class="item" v-for="item in listaItens" :key="item.id">{{ item.name }} - {{ item.qtd }} unidades<button @click="removeItem(item)">X</button></p>
+        </div>
+        <div class="group">
+          <button class="btn" :class="{disable: checkTransporte()}" @click="actionOption2" >Cadastrar transporte</button>
+        </div>
+        <p v-if="warning">Transporte cadastrado com sucesso, você pode verificar os transportes cadastrados ao clicar na opção 3</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -241,18 +371,64 @@ ol li:hover{
   font-weight: 500;
 }
 
-.container_inputs div.btn_container button{
-  padding: 12px 40px;
-  border-radius: 8px;
-  border: none;
-  outline-style: none;
-  cursor: pointer;
-  background-color: #007dbc;
-  color: #fff;
+.menu2 .container_itens .group.itens{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
 }
 
-.container_inputs div.btn_container .disable{
-  opacity: .5;
-  pointer-events: none;
+.menu2 .container_inputs .group div{
+  text-align: justify;
 }
+
+.menu2 .display{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  justify-content: start;
+}
+
+.item button{
+  border: none;
+  outline: none;
+  background-color: white;
+  margin-left: 30px;
+  cursor: pointer;
+  transition: all .5s ease;
+}
+
+.item button:hover{
+  color: #007dbc;
+}
+
+.menu2 .container_inputs .cidades{
+  display: flex;
+  align-items: flex-start;
+  gap: 60px;
+}
+
+.menu2 .container_inputs .cidades .cidade{
+  position: relative;
+}
+
+.menu2 .container_inputs .cidades .cidade button{
+  border: none;
+  outline: none;
+  background-color: white;
+  margin-left: 30px;
+  cursor: pointer;
+  transition: all .5s ease;
+}
+
+.menu2 .container_inputs .cidades .cidade button:hover{
+  color: #007dbc;
+}
+
+.menu2 .container_inputs .cidades div{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
 </style>
