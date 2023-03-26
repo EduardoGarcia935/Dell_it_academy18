@@ -6,6 +6,9 @@ export const useMainStore = defineStore("mainStore" , {
   state: () => {
     return {
       // Vetor com todos os tipos de caminhões
+
+      // PESO TOTAL 7380
+      // DISTÂNCIA TOTAL = 2500
       trucks: [
         {
           name: 'pequeno porte',
@@ -31,37 +34,37 @@ export const useMainStore = defineStore("mainStore" , {
         {
           id: 1,
           name: 'Celular',
-          presoKG: 0.5,
+          pesoKG: 0.5,
           qtd: 0,
         },
         {
           id: 2,
           name: 'Geladeira',
-          presoKG: 60.0,
+          pesoKG: 60.0,
           qtd: 0,
         },
         {
           id: 3,
           name: 'Freezer',
-          presoKG: 100.0,
+          pesoKG: 100.0,
           qtd: 0,
         },
         {
           id: 4,
           name: 'Cadeira',
-          presoKG: 5.0,
+          pesoKG: 5.0,
           qtd: 0,
         },
         {
           id: 5,
           name: 'Luminaria',
-          presoKG: 0.8,
+          pesoKG: 0.8,
           qtd: 0,
         },
         {
           id: 6,
           name: 'Lavadora de roupa',
-          presoKG: 120.0,
+          pesoKG: 120.0,
           qtd: 0,
         },
       ],
